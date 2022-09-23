@@ -42,7 +42,7 @@ class BaseAgent(metaclass=abc.ABCMeta):
         self.config = get_config(config_path=config_path)
         self.connection = self.connect()
         data = read_utf(self.connection)
-        height, width, character, agent_id, agent_score, max_turn_count, agent_count, trap_count = data.strip().split(
+        height, width, character, agent_id, agent_score, max_turn_count, agent_count = data.strip().split(
             " ")
         self.grid_height = int(height)
         self.grid_width = int(width)
@@ -52,7 +52,6 @@ class BaseAgent(metaclass=abc.ABCMeta):
         self.score = int(agent_score)
         self.max_turn_count = int(max_turn_count)
         self.agent_count = int(agent_count)
-        self.trap_count = int(trap_count)
         self.turn_count = 0
         self.agent_scores = []
         write_utf(self.connection, msg="CONFIRM")
@@ -65,12 +64,11 @@ class BaseAgent(metaclass=abc.ABCMeta):
     def _read_turn_data(self, data: str):
         info = data.strip().split(" ")
         self.turn_count = int(info[0])
-        self.trap_count = int(info[1])
-        self.agent_scores = [int(score) for score in info[2:2 + self.agent_count]]
-        gems = [int(item) for item in info[2 + self.agent_count:2 + self.agent_count * 5]]
+        self.agent_scores = [int(score) for score in info[1:1 + self.agent_count]]
+        gems = [int(item) for item in info[1 + self.agent_count:1 + self.agent_count * 5]]
         self.agent_gems = [gems[i:i + 4] for i in range(0, len(gems), 4)]
 
-        self.grid = np.array(info[2 + self.agent_count * 5:]).reshape(self.grid_height, self.grid_width).tolist()
+        self.grid = np.array(info[1 + self.agent_count * 5:]).reshape(self.grid_height, self.grid_width).tolist()
 
     def play(self):
         if self.connection is None:

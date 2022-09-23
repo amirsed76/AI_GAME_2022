@@ -107,14 +107,6 @@ def draw_key(pygame, screen, x, y, key_character):
     screen.blit(image, (X, Y))
 
 
-def draw_trap(pygame, screen, x, y, COLORE):
-    X = x * BLOCK_SIZE + PADDING
-    Y = y * BLOCK_SIZE + PADDING
-    center = (X + BLOCK_SIZE + BLOCK_SIZE // 2, Y + BLOCK_SIZE + BLOCK_SIZE // 2)
-    rect = pygame.Rect(X, Y, BLOCK_SIZE, BLOCK_SIZE)
-    pygame.draw.rect(screen, COLORE, rect, 1)
-
-
 def draw_DOOR(pygame, screen, x, y, COLORE):
     X = x * BLOCK_SIZE + PADDING
     Y = y * BLOCK_SIZE + PADDING
@@ -140,11 +132,6 @@ def draw_characters(pygame, screen, x, y, characters):
     if "4" in characters:
         draw_gem(pygame, screen, x, y, 3)
 
-    # if "a" in characters:
-    #     draw_trap(pygame, screen, x, y, (46, 229, 46))
-    #
-    # if "b" in characters:
-    #     draw_trap(pygame, screen, x, y, (255, 51, 255))
     if "g" in characters:
         draw_key(pygame, screen, x, y, "g")
     if "y" in characters:
@@ -181,7 +168,7 @@ def write_information(pygame, screen, start_address, agent_information, report):
     screen.blit(text, textRect)
 
     for index, info in enumerate(agent_information):
-        Text = f"agent {index + 1} : score = {info['score']}  traps={info['trap_count']}  hits={info['hit_hurts_count']}  trap hurts={info['trap_hurts_count']}" \
+        Text = f"agent {index + 1} : score = {info['score']}   hits={info['hit_hurts_count']} " \
                f" gems= {[info['gem1'], info['gem2'], info['gem3'], info['gem4']]}"
 
         text = font.render(Text, True, (0, 0, 0))

@@ -32,30 +32,26 @@ class Game:
         agents = []
         for i, conn in enumerate(player_connections):
             y, x = addresses[i]
-            agents.append(Agent(agent_id=i, tile=game_map.get_tile(y=y, x=x), init_score=config["init_score"],
-                                trap_count=config["trap_count"], connection=conn))
+            agents.append(
+                Agent(agent_id=i, tile=game_map.get_tile(y=y, x=x), init_score=config["init_score"], connection=conn))
 
         time_out = config["time_out"]
         turn_count = config["turn_count"]
         return Game(time_out=time_out, agents=agents, game_map=game_map, turn_count=turn_count)
 
     def get_show(self, for_player=None):
+        # change_it maybe
         map_array = self.game_map.get_show()
         map_array = map_array.astype(dtype=np.dtype("U25"))
         for agent in self.agents:
             y, x = agent.tile.address
             map_array[y][x] = map_array[y][x] + agent.character
-            if for_player is None or agent.id == for_player.id:
-                for trap_tile in agent.trap_tiles:
-                    y, x = trap_tile.address
-                    map_array[y][x] = map_array[y][x] + agent.trap_character
 
         return map_array
 
     def do_turn_init(self, agent):
         height, width = self.game_map.tiles.shape
-        content = f"{height} {width} {agent.character} {agent.id} {agent.score} {self.max_turn_count} {len(self.agents)} " \
-                  f"{agent.trap_count}"
+        content = f"{height} {width} {agent.character} {agent.id} {agent.score} {self.max_turn_count} {len(self.agents)} "
         agent.connection.write_utf(msg=content)
         confirm_data = agent.connection.read_data()
         if confirm_data is None or confirm_data.lower() != "confirm":
@@ -64,7 +60,7 @@ class Game:
     def send_turn_info(self, agent):
         print(' '.join([' '.join([str(item) for item in player.get_gems_count().values()]) for player in self.agents]))
         map_chars = self.get_show(for_player=agent).reshape(self.game_map.height * self.game_map.width, ).tolist()
-        content = f" {self.turn_number} {agent.trap_count} {' '.join([str(player.score) for player in self.agents])}" \
+        content = f" {self.turn_number} {' '.join([str(player.score) for player in self.agents])}" \
                   f" {' '.join([' '.join([str(item) for item in player.get_gems_count().values()]) for player in self.agents])}" \
                   f" {' '.join(map_chars)}"
 
@@ -81,6 +77,7 @@ class Game:
         self.do_action(action=action, agent=agent)
 
     def add_gem(self, agent: Agent, gem):
+        # change_it
         gem_constraints = game_rules.CONSTRAINTS
         constraint_score = 0
         constraint_max_gem_eating = 1000
@@ -149,7 +146,7 @@ class Game:
 
         key = target.get_key()
         if key is not None:
-            self.add_key(agent=agent , key=key)
+            self.add_key(agent=agent, key=key)
 
         return
 
@@ -201,27 +198,6 @@ class Game:
         else:
             raise Exceptions.NotExistAvailableTeleport(agent_id=agent.id)
 
-    def do_put_trap(self, agent):
-        agent: Agent
-        tile = agent.tile
-
-        if agent.trap_count <= 0:
-            raise Exceptions.AgentNotHaveTrap(agent_id=agent.id)
-
-        for player in self.agents:
-            if tile in agent.trap_tiles:
-                raise Exceptions.ExistTrap(tile_address=tile.address, agent_id=agent.id)
-
-        if tile.is_teleport():
-            raise Exceptions.CantPutTrapInTeleport(agent_id=agent.id)
-
-        trap_index = len(agent.trap_tiles)
-        constraint_gem_score = game_rules.TRAP_CONSTRAINT_SCORE[trap_index]
-        if agent.score > constraint_gem_score:
-            agent.add_trap_tile(tile=tile)
-        else:
-            raise Exceptions.TrapConstraintFailed(agent_id=agent.id)
-
     def do_action(self, action, agent):
         try:
 
@@ -231,9 +207,7 @@ class Game:
 
             elif action == Actions.TELEPORT:
                 self.do_teleport(agent=agent)
-            #
-            # elif action == Actions.TRAP:
-            #     self.do_put_trap(agent=agent)
+
 
             elif action == Actions.NOOP:
                 pass
@@ -248,10 +222,9 @@ class Game:
             for player in self.agents:
                 if player == agent:
                     continue
-                if agent.tile in player.trap_tiles:
-                    agent.trap_hurts.append(player)
 
     def turn_log(self, agent_id, finish=False, winner_id=None, report=""):
+        # change_it
         self.turn_logs.append(
 
             {
@@ -267,6 +240,7 @@ class Game:
         )
 
     def log_map(self):
+        # change_it
         lines = [f"TURN {self.turn_number} \n"]
         for row in self.get_show().tolist():
             row_str = ""
@@ -277,6 +251,7 @@ class Game:
         self.outs_file.writelines(lines)
 
     def is_game_over_finish(self):
+        # change_it
         # for agent in self.agents:
         #     if agent.score <= game_rules.GAME_OVER_SCORE:
         #         return True
@@ -298,6 +273,7 @@ class Game:
                 return [agent1, agent2]
 
     def run(self, first_round=True, last_round=True):
+        # change_it
         if first_round:
             for agent in self.agents:
                 self.do_turn_init(agent=agent)
@@ -318,7 +294,7 @@ class Game:
                 self.do_turn(agent=agent)
 
                 gem1_count, gem2_count, gem3_count, gem4_count = agent.get_gems_count().values()
-                report = f"agent {agent.id} => score:{agent.score} gem1:{gem1_count} gem2:{gem2_count} gem3:{gem3_count} gem4:{gem4_count} trap_count:{agent.trap_count} report: {self.current_report}"
+                report = f"agent {agent.id} => score:{agent.score} gem1:{gem1_count} gem2:{gem2_count} gem3:{gem3_count} gem4:{gem4_count} report: {self.current_report}"
                 print(report)
 
                 self.turn_log(agent_id=agent.id, finish=False, winner_id=None,

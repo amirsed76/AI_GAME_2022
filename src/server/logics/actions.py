@@ -12,4 +12,3 @@ class Actions(Enum):
     DOWN_LEFT = "DOWN_LEFT"
     NOOP = 'NOOP'
     TELEPORT = 'TELEPORT'
-    # TRAP = "TRAP"
