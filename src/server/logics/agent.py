@@ -1,6 +1,7 @@
 from logics.network import Socket
 from logics.map import Tile
 from logics import game_rules
+from logics.actions import Actions
 
 PLAYER_CHARACTERS = ["A", "B", "C", "D"]
 
@@ -14,22 +15,48 @@ class Agent:
         self.gems = []
         self.hit_hurts = []
         self.turn_age = 0
-        self.move_history = []
+        self.action_history = []
         self.keys = []
+        self.barbed_history = []
 
     @property
     def id(self):
         return self._id + 1
 
+    def get_diagonal_move_history_count(self):
+        return sum([self.action_history.count(item) for item in
+                    [Actions.UP_LEFT, Actions.UP_RIGHT,
+                     Actions.DOWN_LEFT, Actions.DOWN_RIGHT]
+                    ])
+
+    def get_straight_move_history_count(self):
+        return sum([self.action_history.count(item) for item in
+                    [Actions.UP, Actions.DOWN, Actions.RIGHT, Actions.LEFT]
+                    ])
+
+    def get_action_score(self):
+        return self.get_diagonal_move_history_count() * game_rules.DIAGONAL_MOVE_HURT + \
+               self.get_straight_move_history_count() * game_rules.STRAIGHT_MOVE_HURT
+
+    def get_gem_score(self):
+        point = 0
+        gem_counts = self.get_gems_count()
+        for i, gem_count in enumerate(gem_counts.values()):
+            point += gem_count * game_rules.GEM_SCORES[i]
+
+        for i in range(1, len(self.gems)):
+            point += game_rules.GEM_SEQUENCE_SCORE[int(self.gems[i - 1].value)][int(self.gems[i].value)]
+
+        return point
+
     @property
     def score(self):
         # change_it
         point = self.init_score
-        gem_counts = self.get_gems_count()
-        for i, gem_count in enumerate(gem_counts.values()):
-            point += gem_count * game_rules.GEM_SCORES[i]
+        point += self.get_gem_score()
         point += len(self.hit_hurts) * game_rules.HIT_HURT
-        point += self.turn_age * game_rules.TURN_HURT
+        point += len(self.barbed_history) * game_rules.BARBED_HURT
+        point += self.get_action_score()
         return point
 
     @property
@@ -72,8 +99,19 @@ class Agent:
         return {
             "score": self.score,
             "hit_hurts_count": len(self.hit_hurts),
+            "barbed_hurts_count": len(self.barbed_history),
             "gem1": gem1,
             "gem2": gem2,
             "gem3": gem3,
             "gem4": gem4,
+
         }
+
+    def add_barbed_history(self, tile):
+        self.barbed_history.append(tile)
+
+    def get_action_history_information(self):
+        return {action.value: self.action_history.count(action) for action in Actions}
+
+    def add_action_history(self, action):
+        self.action_history.append(action)

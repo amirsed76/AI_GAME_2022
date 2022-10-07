@@ -7,5 +7,5 @@
   "init_score": 45,
   "turn_count": 100,
   "init_random_location": false,
-  "round_repeat" : 1
+  "round_repeat": 1
 }

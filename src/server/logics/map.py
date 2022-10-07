@@ -71,6 +71,10 @@ class Tile:
             return None
 
 
+
+
+
+
 class Map:
     def __init__(self, map_content):
 
@@ -105,3 +109,11 @@ class Map:
 
     def get_teleports(self):
         return self._teleports
+
+    def has_any_gems(self):
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.get_tile(y,x).get_gem() is not None:
+                    return True
+
+        return False

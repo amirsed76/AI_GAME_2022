@@ -7,7 +7,8 @@ import numpy as np
 
 def read_utf(connection: socket.socket):
     # length = struct.unpack('>H', connection.recv(2))[0]
-    return connection.recv(2048).decode('utf-8').strip().splitlines()[-1]
+    val = connection.recv(2048).decode('utf-8').strip().splitlines()
+    return val[-1]
 
 
 def write_utf(connection: socket.socket, msg: str):

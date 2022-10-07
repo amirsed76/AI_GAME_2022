@@ -71,42 +71,17 @@ class Game:
             self.send_turn_info(agent)
             turn_action_request = agent.connection.read_data()
             action = Actions(turn_action_request)
+
         except Exception as e:
             print(bcolors.WARNING + f"not valid action " + bcolors.reset)
             action = Actions.NOOP
         self.do_action(action=action, agent=agent)
+        agent.add_action_history(action=action)
 
     def add_gem(self, agent: Agent, gem):
-        # change_it
-        gem_constraints = game_rules.CONSTRAINTS
-        constraint_score = 0
-        constraint_max_gem_eating = 1000
-        agent_gems_count = agent.get_gems_count()
-        agent_gem_count = 0
-
-        if gem == Tile.TileType.GEM1:
-            constraint_score = gem_constraints["min_score_for_get_gem_1"]
-            constraint_max_gem_eating = gem_constraints["max_eating_gem_1"]
-            agent_gem_count = agent_gems_count["gem1"]
-
-        if gem == Tile.TileType.GEM2:
-            constraint_score = gem_constraints["min_score_for_get_gem_2"]
-            constraint_max_gem_eating = gem_constraints["max_eating_gem_2"]
-            agent_gem_count = agent_gems_count["gem2"]
-
-        if gem == Tile.TileType.GEM3:
-            constraint_score = gem_constraints["min_score_for_get_gem_3"]
-            constraint_max_gem_eating = gem_constraints["max_eating_gem_3"]
-            agent_gem_count = agent_gems_count["gem3"]
-
-        if gem == Tile.TileType.GEM4:
-            constraint_score = gem_constraints["min_score_for_get_gem_4"]
-            constraint_max_gem_eating = gem_constraints["max_eating_gem_4"]
-            agent_gem_count = agent_gems_count["gem4"]
-
-        if agent.score >= constraint_score and agent_gem_count < constraint_max_gem_eating:
-            agent.add_gem(gem)
-            agent.tile.tile_type = Tile.TileType.EMPTY
+        # todo add gem constraints
+        agent.add_gem(gem)
+        agent.tile.tile_type = Tile.TileType.EMPTY
 
     @staticmethod
     def add_key(agent: Agent, key):
@@ -148,6 +123,8 @@ class Game:
         if key is not None:
             self.add_key(agent=agent, key=key)
 
+        if target.is_barbed():
+            agent.add_barbed_history(tile=target)
         return
 
     def get_move_target(self, agent: Agent, action_type: Actions):
@@ -250,12 +227,8 @@ class Game:
         lines.append("-" * 10 + "\n")
         self.outs_file.writelines(lines)
 
-    def is_game_over_finish(self):
-        # change_it
-        # for agent in self.agents:
-        #     if agent.score <= game_rules.GAME_OVER_SCORE:
-        #         return True
-        return False
+    def is_game_finish_early(self):
+        return len(self.agents) < 2 and not self.game_map.has_any_gems()
 
     def get_winner(self):
         # TODO for two players
@@ -300,7 +273,7 @@ class Game:
                 self.turn_log(agent_id=agent.id, finish=False, winner_id=None,
                               report=f"agent {agent.id} :{self.current_report}")
 
-            if self.is_game_over_finish():
+            if self.is_game_finish_early():
                 break
 
         winners = self.get_winner()
