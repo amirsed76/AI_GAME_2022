@@ -45,7 +45,7 @@ class Agent:
             point += gem_count * game_rules.GEM_SCORES[i]
 
         for i in range(1, len(self.gems)):
-            point += game_rules.GEM_SEQUENCE_SCORE[int(self.gems[i - 1].value)][int(self.gems[i].value)]
+            point += game_rules.GEM_SEQUENCE_SCORE[int(self.gems[i - 1].value)-1][int(self.gems[i].value)-1]
 
         return point
 
