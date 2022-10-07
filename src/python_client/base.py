@@ -33,7 +33,7 @@ class Action(enum.Enum):
     DOWN_RIGHT = "DOWN_RIGHT"
     DOWN_LEFT = "DOWN_LEFT"
     NOOP = 'NOOP'
-    TELEPORT = 'TELEPORT'
+    # TELEPORT = 'TELEPORT'
 
 
 class BaseAgent(metaclass=abc.ABCMeta):
