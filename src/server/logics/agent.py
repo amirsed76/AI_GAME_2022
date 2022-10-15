@@ -40,12 +40,18 @@ class Agent:
 
     def get_gem_score(self):
         point = 0
-        gem_counts = self.get_gems_count()
-        for i, gem_count in enumerate(gem_counts.values()):
-            point += gem_count * game_rules.GEM_SCORES[i]
+        # gem_counts = self.get_gems_count()
+        # for i, gem_count in enumerate(gem_counts.values()):
+        #     point += gem_count * game_rules.GEM_SCORES[i]
+        gems = [None]+self.gems.copy()
 
-        for i in range(1, len(self.gems)):
-            point += game_rules.GEM_SEQUENCE_SCORE[int(self.gems[i - 1].value)-1][int(self.gems[i].value)-1]
+        for i in range(1, len(gems)):
+            if i == 1:
+                first = 0
+            else:
+                first = int(gems[i - 1].value)-1
+            second = int(gems[i].value)-1
+            point += game_rules.GEM_SEQUENCE_SCORE[first][second]
 
         return point
 
