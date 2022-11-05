@@ -8,6 +8,7 @@ import java.net.Socket;
 
 public abstract class Base {
     private Socket connection;
+    private Integer[] gems;
     private final String serverIp;
     private final int serverPort;
     private PrintWriter printWriter;
@@ -81,7 +82,7 @@ public abstract class Base {
         this.serverIp = serverIp;
         try {
             connect();
-            var dataArray = this.bufferedReader.readLine().trim().split(" ");
+            String[] dataArray = this.bufferedReader.readLine().trim().split(" ");
             this.gridHeight = Integer.parseInt(dataArray[0]);
             this.gridWidth = Integer.parseInt(dataArray[1]);
             this.character = dataArray[2].charAt(0);
@@ -89,13 +90,13 @@ public abstract class Base {
             this.score = Integer.parseInt(dataArray[4]);
             this.maxTurnCount = Integer.parseInt(dataArray[5]);
             this.agentCount = Integer.parseInt(dataArray[6]);
-            this.trapCount = Integer.parseInt(dataArray[7]);
             this.agentScores = new int[agentCount];
             this.printWriter.println("CONFIRM");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private void connect() throws IOException {
         if (connection != null && connection.isConnected()) {
@@ -107,7 +108,7 @@ public abstract class Base {
     }
 
     public enum Action {
-        Up("UP"), Down("DOWN"), Left("LEFT"), Right("RIGHT"), NoOp("NOOP"), Teleport("TELEPORT"), Trap("TRAP");
+        Up("UP"), Down("DOWN"), Left("LEFT"), Right("RIGHT"), UpRight("UP_RIGHT"), UpLeft("UP_LEFT"), DownRight("DOWN_RIGHT"), DownLeft("DOWN_LEFT"), NoOp("NOOP");
 
         private final String command;
 
@@ -117,12 +118,15 @@ public abstract class Base {
     }
 
     private void parseTurnData(String data) {
-        var dataArray = data.trim().split(" ");
+        String[] dataArray = data.trim().split(" ");
         this.turnCount = Integer.parseInt(dataArray[0]);
-        this.trapCount = Integer.parseInt(dataArray[1]);
-        var count = 2;
+        int count = 1;
         for (int i = 0; i < this.agentCount; i++, count++) {
             agentScores[i] = Integer.parseInt(dataArray[count]);
+        }
+        this.gems = new Integer[this.agentCount * 4];
+        for (int i = 0; i < this.agentCount * 4; i++, count++) {
+            this.gems[i] = Integer.parseInt(dataArray[count]);
         }
         this.grid = new String[gridHeight][gridWidth];
         for (int i = 0; i < gridHeight; i++) {
@@ -132,12 +136,13 @@ public abstract class Base {
         }
     }
 
+
     protected abstract Action doTurn();
 
     public void play() throws IOException {
         connect();
         while (true) {
-            var data = this.bufferedReader.readLine();
+            String data = this.bufferedReader.readLine();
             while (this.bufferedReader.ready()) {
                 data = this.bufferedReader.readLine();
             }
@@ -145,7 +150,7 @@ public abstract class Base {
                 return;
             }
             parseTurnData(data);
-            var action = doTurn().command;
+            String action = doTurn().command;
             printWriter.println(action);
         }
     }

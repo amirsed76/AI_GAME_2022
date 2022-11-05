@@ -181,10 +181,9 @@ class Game:
             if action in [Actions.UP, Actions.UP_LEFT, Actions.UP_RIGHT, Actions.DOWN, Actions.DOWN_LEFT,
                           Actions.DOWN_RIGHT, Actions.RIGHT, Actions.LEFT]:
                 self.do_move_action(agent=agent, action_type=action)
-
-            elif action == Actions.TELEPORT:
-                self.do_teleport(agent=agent)
-
+            #
+            # elif action == Actions.TELEPORT:
+            #     self.do_teleport(agent=agent)
 
             elif action == Actions.NOOP:
                 pass
