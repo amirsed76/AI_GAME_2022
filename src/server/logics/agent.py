@@ -49,7 +49,7 @@ class Agent:
             if i == 1:
                 first = 0
             else:
-                first = int(gems[i - 1].value)-1
+                first = int(gems[i - 1].value)
             second = int(gems[i].value)-1
             point += game_rules.GEM_SEQUENCE_SCORE[first][second]
 
