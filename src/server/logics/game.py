@@ -159,8 +159,49 @@ class Game:
                                               tile_address=agent.tile.address)
         return target
 
+    def get_probability_move(self, tile: Tile, action_type: Actions):
+        if action_type == Actions.NOOP:
+            return Actions.NOOP
+        action_option1, action_option2 = Actions.two_near_move(action_type)
+        rand_number = random.random()
+        if tile.tile_type == Tile.TileType.EMPTY:
+            probabilities = game_rules.PROBABILITIES["normal"]
+
+        elif tile.tile_type == Tile.TileType.BARBED:
+            probabilities = game_rules.PROBABILITIES["barbed"]
+
+
+        elif tile.tile_type in [Tile.TileType.KEY1, Tile.TileType.KEY2, Tile.TileType.KEY3,
+                                Tile.TileType.GEM1, Tile.TileType.GEM2, Tile.TileType.GEM3, Tile.TileType.GEM4]:
+            probabilities = game_rules.PROBABILITIES["slider"]
+
+
+        elif tile.tile_type == Tile.TileType.TELEPORT:
+            probabilities = game_rules.PROBABILITIES["teleport"]
+
+
+
+        else:
+            return action_type
+
+        for action_state, p in probabilities.items():
+            if action_state == "real_action":
+                action = action_type
+            elif action_state == "option1":
+                action = action_option1
+            elif action_state == "option2":
+                action = action_option2
+            else:
+                action = action_state
+
+            if rand_number <= p:
+                return action
+            rand_number -= p
+
     def do_move_action(self, agent: Agent, action_type: Actions):
-        target = self.get_move_target(agent=agent, action_type=action_type)
+
+        target = self.get_move_target(agent=agent,
+                                      action_type=action_type)
         self.go_target(agent=agent, target=target)
 
     def do_teleport(self, agent: Agent):
@@ -177,13 +218,17 @@ class Game:
 
     def do_action(self, action, agent):
         try:
-
+            print(action)
+            if action not in  Actions.accepted_action():
+                raise Exceptions.InValidAction(agent_id=agent.id)
+            action = self.get_probability_move(tile=agent.tile, action_type=action)
+            print(action)
             if action in [Actions.UP, Actions.UP_LEFT, Actions.UP_RIGHT, Actions.DOWN, Actions.DOWN_LEFT,
                           Actions.DOWN_RIGHT, Actions.RIGHT, Actions.LEFT]:
                 self.do_move_action(agent=agent, action_type=action)
-            #
-            # elif action == Actions.TELEPORT:
-            #     self.do_teleport(agent=agent)
+            # #
+            elif action == Actions.TELEPORT:
+                self.do_teleport(agent=agent)
 
             elif action == Actions.NOOP:
                 pass

@@ -1,5 +1,5 @@
 {
-  "map": "4.txt",
+  "map": "11.txt",
   "server_ip": "127.0.0.1",
   "server_port": 9921,
   "player_count": 1,
@@ -7,5 +7,5 @@
   "init_score": 0,
   "turn_count": 100,
   "init_random_location": false,
-  "round_repeat": 1
+  "round_repeat": 5
 }
