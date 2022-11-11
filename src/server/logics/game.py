@@ -164,7 +164,7 @@ class Game:
             return Actions.NOOP
         action_option1, action_option2 = Actions.two_near_move(action_type)
         rand_number = random.random()
-        if tile.tile_type == Tile.TileType.EMPTY:
+        if tile.tile_type in [Tile.TileType.EMPTY, Tile.TileType.DOOR1, Tile.TileType.DOOR2, Tile.TileType.DOOR3]:
             probabilities = game_rules.PROBABILITIES["normal"]
 
         elif tile.tile_type == Tile.TileType.BARBED:
@@ -219,7 +219,7 @@ class Game:
     def do_action(self, action, agent):
         try:
             print(action)
-            if action not in  Actions.accepted_action():
+            if action not in Actions.accepted_action():
                 raise Exceptions.InValidAction(agent_id=agent.id)
             action = self.get_probability_move(tile=agent.tile, action_type=action)
             print(action)
