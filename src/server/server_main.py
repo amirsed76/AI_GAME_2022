@@ -5,6 +5,7 @@ from logics.network import Socket
 from logics import Exceptions
 from pathlib import Path
 from logics.utils import bcolors
+from logics.game_rules import update_probabilities
 
 
 def parse_args():
@@ -57,6 +58,8 @@ def main():
     server_ip = config["server_ip"]
     server_port = config["server_port"]
     map_path = f"maps/{config['map']}"
+    probabilities_xlsx_path = f"probabilities/{config['probabilities_xlsx']}"
+    update_probabilities(probabilities_xlsx_path)
     server = Socket.create(ip=server_ip, port=server_port)
     player_connections = []
     if config["player_count"] not in range(1, 3):
@@ -84,4 +87,5 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
+        raise e
         print(bcolors.FAIL, e, bcolors.reset)

@@ -42,7 +42,7 @@ class BaseAgent(metaclass=abc.ABCMeta):
         self.config = get_config(config_path=config_path)
         self.connection = self.connect()
         data = read_utf(self.connection)
-        height, width, character, agent_id, agent_score, max_turn_count, agent_count = data.strip().split(
+        height, width, character, agent_id, agent_score, max_turn_count, agent_count ,*probes = data.strip().split(
             " ")
         self.grid_height = int(height)
         self.grid_width = int(width)
@@ -54,6 +54,7 @@ class BaseAgent(metaclass=abc.ABCMeta):
         self.agent_count = int(agent_count)
         self.turn_count = 0
         self.agent_scores = []
+        self.probabilities = {}
         write_utf(self.connection, msg="CONFIRM")
 
     def connect(self):

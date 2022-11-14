@@ -28,3 +28,4 @@ class Actions(Enum):
     @classmethod
     def accepted_action(cls):
         return [cls.UP, cls.UP_RIGHT, cls.RIGHT, cls.DOWN_RIGHT, cls.DOWN, cls.DOWN_LEFT, cls.LEFT, cls.UP_LEFT,cls.NOOP]
+
