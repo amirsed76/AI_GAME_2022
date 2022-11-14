@@ -51,8 +51,11 @@ class Game:
 
     def do_turn_init(self, agent):
         height, width = self.game_map.tiles.shape
-        content = f"{height} {width} {agent.character} {agent.id} {agent.score} {self.max_turn_count} {len(self.agents)} "
-        agent.connection.write_utf(msg=content)
+        content = {"height": height, "width": width, "character": agent.character, "id": agent.id, "score": agent.score,
+                   "max_turn_count": self.max_turn_count, "agent_count": len(self.agents),
+                   "probabilities": game_rules.PROBABILITIES}
+        # content = f"{height} {width} {agent.character} {agent.id} {agent.score} {self.max_turn_count} {len(self.agents)} "
+        agent.connection.write_utf(msg=str(json.dumps(content)))
         confirm_data = agent.connection.read_data()
         if confirm_data is None or confirm_data.lower() != "confirm":
             raise Exception(f"agent with id={agent.id} not send confirm")
